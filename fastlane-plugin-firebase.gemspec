@@ -30,5 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'fastlane', '>= 2.5.0'
   spec.add_dependency 'mechanize'
+  spec.add_dependency 'googleauth'
+  spec.add_dependency 'httparty'
   
 end

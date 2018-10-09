@@ -26,6 +26,24 @@ module Fastlane
 				login(email, password)
 			end
 
+			require 'googleauth'
+			require 'httparty'
+			def initialize(jsonPath)
+				@base_url = "https://firebase.googleapis.com"
+
+				scope = 'https://www.googleapis.com/auth/firebase'
+
+				authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+					json_key_io: File.open('firebase-api-test-b515420aa5ab.json'),
+					scope: scope
+					)
+  
+				access_token = authorizer.fetch_access_token!["access_token"]
+				@authorization_headers = {
+					'Authorization' => 'Bearer ' + access_token
+				}
+			end
+
 			def login(email, password)
 				UI.message "Logging in to Google account #{email}"
 
@@ -183,33 +201,30 @@ module Fastlane
 
 			def request_json(path, method = :get, parameters = Hash.new, headers = Hash.new)
 					begin
-					if method == :get then
-						parameters["key"] = @api_key
-						page = @agent.get("#{@sdk_url}#{path}", parameters, nil, headers.merge(@authorization_headers))
-					elsif method == :post then
-						headers['Content-Type'] = 'application/json'
-						page = @agent.post("#{@sdk_url}#{path}?key=#{@api_key}", parameters.to_json, headers.merge(@authorization_headers))
-					elsif method == :delete then
-						page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
-					end
-
-					JSON.parse(page.body)
-
-					rescue Mechanize::ResponseCodeError => e
-						code = e.response_code.to_i
-						if code >= 400 && code < 500 then
-							if body = JSON.parse(e.page.body) then
-								raise BadRequestError.new(body["error"]["message"], code)
-							end
+						if method == :get then
+							response = HTTParty.get("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), format: :plain)
+						elsif method == :post then
+							# TODO
+							headers['Content-Type'] = 'application/json'
+							page = @agent.post("#{@sdk_url}#{path}?key=#{@api_key}", parameters.to_json, headers.merge(@authorization_headers))
+						elsif method == :delete then
+							# TODO
+							page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
 						end
-						UI.crash! e.page.body
+
+						JSON.parse(response, :symbolize_names => true)
+
+					rescue HTTParty::Error => e
+						UI.crash! e.response.body
+					rescue StandardError => e
+						UI.crash! e
 					end
 			end
 
 			def project_list
 				UI.message "Retrieving project list"
-				json = request_json("v1/projects")
-				projects = json["project"] || []
+				json = request_json("v1beta1/projects")
+				projects = json[:results] || []
 				UI.success "Found #{projects.count} projects"
 				projects
 			end

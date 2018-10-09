@@ -4,15 +4,13 @@ module Fastlane
       require 'security'
       
       def self.run(params)
-        manager = Firebase::Manager.new
-        # Login
-        api = manager.login(params[:username])
+        api = Firebase::Api.new(params[:service_account_json_path])
 
         # List projects
         projects = api.project_list()
        
         projects.each_with_index { |p, i| 
-          UI.message "#{i+1}. #{p["displayName"]} (#{p["projectNumber"]})" 
+          UI.message "#{i+1}. #{p[:displayName]} (#{p[:projectNumber]})" 
           clients = p["clientSummary"] || []
           clients.sort {|left, right| left["clientId"] <=> right["clientId"] }.each_with_index { |client, j|
             UI.message "  - #{client["clientId"]} (#{client["displayName"]})" 
@@ -39,9 +37,9 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :username,
-                                  env_name: "FIREBASE_USERNAME",
-                               description: "Username for your google account",
+          FastlaneCore::ConfigItem.new(key: :service_account_json_path,
+                                  env_name: "FIREBASE_SERVICE_ACCOUNT_JSON_PATH",
+                               description: "Path to service account json key",
                                   optional: false),
           FastlaneCore::ConfigItem.new(key: :project_number,
                                   env_name: "FIREBASE_PROJECT_NUMBER",
