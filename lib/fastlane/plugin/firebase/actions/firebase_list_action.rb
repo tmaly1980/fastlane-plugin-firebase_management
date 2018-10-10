@@ -8,12 +8,16 @@ module Fastlane
 
         # List projects
         projects = api.project_list()
-       
+        projects.map! { |project|
+          project[:apps] = api.app_list(project[:projectId])
+          project
+        }
+
         projects.each_with_index { |p, i| 
           UI.message "#{i+1}. #{p[:displayName]} (#{p[:projectNumber]})" 
-          clients = p["clientSummary"] || []
-          clients.sort {|left, right| left["clientId"] <=> right["clientId"] }.each_with_index { |client, j|
-            UI.message "  - #{client["clientId"]} (#{client["displayName"]})" 
+          apps = p[:apps] || []
+          apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
+            UI.message "  - #{app[:appId]} (#{app[:displayName]})" 
           } 
         }
       end

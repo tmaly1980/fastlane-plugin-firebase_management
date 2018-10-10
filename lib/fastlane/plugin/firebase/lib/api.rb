@@ -229,6 +229,15 @@ module Fastlane
 				projects
 			end
 
+			def app_list(project_id)
+				UI.message "Retrieving app list for project #{project_id}"
+				json = request_json("v1beta1/projects/#{project_id}/iosApps")
+				apps = json[:apps] || []
+				UI.success "Found #{apps.count} apps"
+				apps
+			end			
+
+
 			def add_client(project_number, type, bundle_id, app_name, ios_appstore_id )
 				parameters = {
 					"requestHeader" => { "clientVersion" => "FIREBASE" },
