@@ -212,7 +212,12 @@ module Fastlane
 							page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
 						end
 
-						JSON.parse(response, :symbolize_names => true)
+						case response.code
+							when 400...600
+								UI.crash! response
+							else
+								JSON.parse(response)
+						end
 
 					rescue HTTParty::Error => e
 						UI.crash! e.response.body
@@ -224,7 +229,7 @@ module Fastlane
 			def project_list
 				UI.message "Retrieving project list"
 				json = request_json("v1beta1/projects")
-				projects = json[:results] || []
+				projects = json["results"] || []
 				UI.success "Found #{projects.count} projects"
 				projects
 			end
@@ -232,7 +237,7 @@ module Fastlane
 			def app_list(project_id)
 				UI.message "Retrieving app list for project #{project_id}"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps")
-				apps = json[:apps] || []
+				apps = json["apps"] || []
 				UI.success "Found #{apps.count} apps"
 				apps
 			end			
@@ -283,19 +288,12 @@ module Fastlane
 				json = request_json("v1/projects/#{project_number}/clients/#{client_id}:setApnsCertificate", :post, parameters)
 			end
 
-			def download_config_file(project_number, client_id)
-				
-				request = "[\"getArtifactRequest\",null,\"#{client_id}\",\"1\",\"#{project_number}\"]"
-				code = (client_id.start_with? "ios") ? "1" : "2"
-				url = @base_url + "/m/mobilesdk/projects/" + project_number + "/clients/" + CGI.escape(client_id) + "/artifacts/#{code}?param=" + CGI.escape(request)
+			def download_config_file(project_id, app_id)
 				UI.message "Downloading config file"
-				begin
-					config = @agent.get url
-					UI.success "Successfuly downloaded #{config.filename}"
-					config
-				rescue Mechanize::ResponseCodeError => e
-					UI.crash! e.page.body
-				end
+				json = request_json("v1beta1/projects/#{project_id}/iosApps/#{app_id}/config")
+				# returns 501 NOT IMPLEMENTED
+				UI.success "Successfuly downloaded #{json["configFilename"]}"
+				json
 			end
 		end
 	end

@@ -7,44 +7,24 @@ module Fastlane
         "firebase.google.com"
       end
 
-			def login(username)
-				item = Security::InternetPassword.find(server: server_name(), account: username)
-        keychain_password = item.password if item
-
-        password = keychain_password
+			def login(jsonPath)
         begin 
-          password = UI.password("Password for #{username}") unless password
-          
           #Api instance
-          @api = Firebase::Api.new(username, password)
-          
-          #Store password
-          Security::InternetPassword.add(server_name(), username, password) unless keychain_password == password
-
+          @api = Firebase::Api.new(jsonPath)
           @api
-        rescue Firebase::Api::LoginError => e
-          UI.error e.message
-
-          if UI.confirm "Do you want to re-enter your password?" then
-        	  password = nil
-            if keychain_password then
-              puts "Removing Keychain entry for user '#{username}'...".yellow
-              Security::InternetPassword.delete(server: server_name(), account: username)
-            end
-            keychain_password = nil
-            retry
-          end
+        rescue StandardError => e
+          UI.crash! e
         end
 			end
 
-			def select_project(project_number)
+			def select_project(project_id)
 				projects = @api.project_list()
         if projects.count == 0 then
           UI.user_error! "No projects exist under the account"
           return
         end
 
-				if project = projects.select {|p| p["projectNumber"] == project_number }.first then
+				if project = projects.select {|p| p["projectId"] == project_id }.first then
 					project
 				else 
         	options = projects.map { |p| p["displayName"] }
@@ -53,20 +33,24 @@ module Fastlane
         end
       end
 
-      def select_client(project, client_id)
-        if project["clientSummary"] == nil then
-          UI.user_error! "Project has no clients"
+      def select_app(project, app_id)
+
+        project["apps"] = @api.app_list(project["projectId"])
+
+
+        if project["apps"].empty? then
+          UI.user_error! "Project has no apps"
           return
         end
 
-        clients = (project["clientSummary"] || []).sort {|left, right| left["clientId"] <=> right["clientId"] }
+        apps = project["apps"].sort {|left, right| left["appId"] <=> right["appId"] }
 
-      	if client = clients.select {|c| c["clientId"] == client_id }.first then
-      		client
+      	if app = apps.select {|a| a["appId"] == app_id }.first then
+      		app
       	else
-      		options = clients.map { |p| "#{p["clientId"]} (#{p["displayName"]})" }
-      		index = select_index("Select client:", options)
-      		clients[index]
+      		options = apps.map { |a| "#{a["appId"]} (#{a["displayName"]})" }
+      		index = select_index("Select app:", options)
+      		apps[index]
 	      end
       end
 

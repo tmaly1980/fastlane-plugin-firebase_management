@@ -4,20 +4,23 @@ module Fastlane
       require 'security'
       
       def self.run(params)
-        api = Firebase::Api.new(params[:service_account_json_path])
+        manager = Firebase::Manager.new
+        
+        # Login
+        api = manager.login(params[:service_account_json_path])
 
         # List projects
         projects = api.project_list()
         projects.map! { |project|
-          project[:apps] = api.app_list(project[:projectId])
+          project["apps"] = api.app_list(project["projectId"])
           project
         }
 
         projects.each_with_index { |p, i| 
-          UI.message "#{i+1}. #{p[:displayName]} (#{p[:projectNumber]})" 
-          apps = p[:apps] || []
+          UI.message "#{i+1}. #{p["displayName"]} (#{p["projectId"]})" 
+          apps = p["apps"] || []
           apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
-            UI.message "  - #{app[:appId]} (#{app[:displayName]})" 
+            UI.message "  - #{app["appId"]} (#{app["displayName"]})" 
           } 
         }
       end
@@ -44,11 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :service_account_json_path,
                                   env_name: "FIREBASE_SERVICE_ACCOUNT_JSON_PATH",
                                description: "Path to service account json key",
-                                  optional: false),
-          FastlaneCore::ConfigItem.new(key: :project_number,
-                                  env_name: "FIREBASE_PROJECT_NUMBER",
-                               description: "Project number",
-                                  optional: true)
+                                  optional: false)
         ]
       end
 
