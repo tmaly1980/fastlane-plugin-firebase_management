@@ -9,7 +9,7 @@ module Fastlane
         api = manager.login(params[:service_account_json_path])
 
         #Select project
-        project = manager.select_project(params[:projectId])
+        project = manager.select_project(params[:project_id])
         project_id = project["projectId"]
 
         #Select app
@@ -51,7 +51,7 @@ module Fastlane
                                   env_name: "FIREBASE_SERVICE_ACCOUNT_JSON_PATH",
                                description: "Path to service account json key",
                                   optional: false),
-          FastlaneCore::ConfigItem.new(key: :projectId,
+          FastlaneCore::ConfigItem.new(key: :project_id,
                                   env_name: "FIREBASE_PROJECT_ID",
                                description: "Project id",
                                   optional: true),

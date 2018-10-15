@@ -22,10 +22,10 @@ module Fastlane
 			def initialize(jsonPath)
 				@base_url = "https://firebase.googleapis.com"
 
-				scope = 'https://www.googleapis.com/auth/firebase'
+				scope = 'https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/cloud-platform'
 
 				authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-					json_key_io: File.open('firebase-api-test-b515420aa5ab.json'),
+					json_key_io: File.open(jsonPath),
 					scope: scope
 					)
   
@@ -40,9 +40,8 @@ module Fastlane
 						if method == :get then
 							response = HTTParty.get("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), format: :plain)
 						elsif method == :post then
-							# TODO
 							headers['Content-Type'] = 'application/json'
-							page = @agent.post("#{@sdk_url}#{path}?key=#{@api_key}", parameters.to_json, headers.merge(@authorization_headers))
+							response = HTTParty.post("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), body: parameters.to_json, format: :plain)
 						elsif method == :delete then
 							# TODO
 							page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
@@ -76,38 +75,16 @@ module Fastlane
 				apps = json["apps"] || []
 				UI.success "Found #{apps.count} apps"
 				apps
-			end			
+			end
 
-
-			def add_client(project_number, type, bundle_id, app_name, ios_appstore_id )
+			def add_ios_app(project_id, bundle_id, app_name)
 				parameters = {
-					"requestHeader" => { "clientVersion" => "FIREBASE" },
+					"projectId" => project_id,
+					"bundleId" => bundle_id,
 					"displayName" => app_name || ""
 				}
 
-				case type
-					when :ios
-						parameters["iosData"] = {
-							"bundleId" => bundle_id,
-							"iosAppStoreId" => ios_appstore_id || ""
-						}
-					when :android
-						parameters["androidData"] = {
-							"packageName" => bundle_id
-						}
-				end
-
-				json = request_json("v1/projects/#{project_number}/clients", :post, parameters)
-				if client = json["client"] then
-					UI.success "Successfuly added client #{bundle_id}"
-					client
-				else
-					UI.error "Client could not be added"
-				end
-			end
-
-			def delete_client(project_number, client_id)
-				json = request_json("v1/projects/#{project_number}/clients/#{client_id}", :delete)
+				request_json("v1beta1/projects/#{project_id}/iosApps", :post, parameters)
 			end
 
 			def upload_certificate(project_number, client_id, type, certificate_value, certificate_password)
