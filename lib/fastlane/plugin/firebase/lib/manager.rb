@@ -24,7 +24,7 @@ module Fastlane
 				if project = projects.select {|p| p["projectId"] == project_id }.first then
 					project
 				else 
-					options = projects.map { |p| p["displayName"] }
+					options = projects.map { |p| "#{p["displayName"]} (#{p["projectId"]})" }
 					index = select_index("Select project:", options)
 					projects[index]
 				end
@@ -45,7 +45,7 @@ module Fastlane
 				if app = apps.select {|a| a["appId"] == app_id }.first then
 					app
 				else
-					options = apps.map { |a| "#{a["appId"]} (#{a["displayName"]})" }
+					options = apps.map { |a| "#{a["displayName"] || a["bundleId"]} (#{a["appId"]})" }
 					index = select_index("Select app:", options)
 					apps[index]
 				end

@@ -5,13 +5,13 @@ module Fastlane
 			def self.run(params)
 				manager = Firebase::Manager.new
 				
-				# Login
+				# login
 				api = manager.login(params[:service_account_json_path])
 
-				#Select project
+				# select project
 				project = manager.select_project(params[:project_id])
 
-				# Client input
+				# select type
 				type = params[:type].to_sym
 
 				bundle_id = params[:bundle_id]
@@ -19,16 +19,25 @@ module Fastlane
 
 				case type
 				when :ios
+					# create new ios app on Firebase
 					api.add_ios_app(project["projectId"], bundle_id, display_name)
 
+					# App creation is a long-running operation.
+					# Creation endpoint returns operation ID which should be used to check
+					# the result of the operation. This requires another Google API to be
+					# enabled and other stuff to do so just wait for 3 seconds here, fetch
+					# apps from Firebase and check whether the new app is there.
 					sleep 3
 
+					# download apps for project
 					apps = api.app_list(project["projectId"])
 
+					# search for newly created app
 					app = apps.detect {|app| app["bundleId"] == bundle_id }
 
+					# present result to user
 					if app != nil then
-						UI.success "App created"
+						UI.success "New app with id: #{app["appId"]} successfully created"
 					else
 						UI.crash! "Unable to create new app"
 					end
@@ -49,7 +58,7 @@ module Fastlane
 			end
 
 			def self.description
-				"An unofficial tool to access Firebase"
+				"Add new app to Firebase project"
 			end
 
 			def self.authors
@@ -62,7 +71,7 @@ module Fastlane
 
 			def self.details
 				# Optional:
-				"Firebase helps you list your projects, create applications, download configuration files and more..."
+				"Firebase plugin helps you list your projects, create applications and download configuration files."
 			end
 
 			def self.available_options
@@ -86,10 +95,10 @@ module Fastlane
 
 					FastlaneCore::ConfigItem.new(key: :type,
 											env_name: "FIREBASE_TYPE",
-											description: "Type of client (ios, android)",
+										 description: "Type of client (ios, android)",
 											verify_block: proc do |value|
-											types = [:ios, :android]
-											UI.user_error!("Type must be in #{types}") unless types.include?(value.to_sym)
+												types = [:ios, :android]
+												UI.user_error!("Type must be in #{types}") unless types.include?(value.to_sym)
 											end
 										 ),
 					FastlaneCore::ConfigItem.new(key: :bundle_id,
@@ -103,15 +112,15 @@ module Fastlane
 											optional: true),
 
 					FastlaneCore::ConfigItem.new(key: :output_path,
-											env_name: "FIREBASE_OUTPUT_PATH",
-										 description: "Path for the downloaded config",
-											optional: false,
-											default_value: "./"),
+					                        env_name: "FIREBASE_OUTPUT_PATH",
+					                     description: "Path for the downloaded config",
+					                        optional: false,
+					                   default_value: "./"),
 
 					FastlaneCore::ConfigItem.new(key: :output_name,
-											env_name: "FIREBASE_OUTPUT_NAME",
-										 description: "Name of the downloaded file",
-											optional: true)
+					                        env_name: "FIREBASE_OUTPUT_NAME",
+					                     description: "Name of the downloaded file",
+					                        optional: true)
 				]	
 			end
 

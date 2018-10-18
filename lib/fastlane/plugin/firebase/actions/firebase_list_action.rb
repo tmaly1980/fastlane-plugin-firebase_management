@@ -1,32 +1,36 @@
 module Fastlane
 	module Actions
 		class FirebaseListAction < Action
-			require 'security'
 
 			def self.run(params)
 				manager = Firebase::Manager.new
 
-				# Login
+				# login
 				api = manager.login(params[:service_account_json_path])
 
-				# List projects
+				# download list of projects
 				projects = api.project_list()
+
+				# download list of apps for each project
 				projects.map! { |project|
 					project["apps"] = api.app_list(project["projectId"])
 					project
 				}
 
+				# create formatted output
 				projects.each_with_index { |p, i| 
 					UI.message "#{i+1}. #{p["displayName"]} (#{p["projectId"]})" 
 					apps = p["apps"] || []
 					apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
-						UI.message "  - #{app["appId"]} (#{app["displayName"]})" 
-					} 
+						UI.message "  - #{app["displayName"] || app["bundleId"]} (#{app["appId"]})" 
+					}
 				}
+
+				return nil
 			end
 
 			def self.description
-				"An unofficial tool to access Firebase"
+				"List all Firebase projects and their apps"
 			end
 
 			def self.authors
@@ -39,7 +43,7 @@ module Fastlane
 
 			def self.details
 				# Optional:
-				"Firebase helps you list your projects, create applications, download configuration files and more..."
+				"Firebase plugin helps you list your projects, create applications and download configuration files."
 			end
 
 			def self.available_options

@@ -59,18 +59,18 @@ module Fastlane
 			end
 
 			def project_list
-				UI.message "Retrieving project list"
+				UI.verbose "Retrieving project list"
 				json = request_json("v1beta1/projects")
 				projects = json["results"] || []
-				UI.success "Found #{projects.count} projects"
+				UI.verbose "Found #{projects.count} projects"
 				projects
 			end
 
 			def app_list(project_id)
-				UI.message "Retrieving app list for project #{project_id}"
+				UI.verbose "Retrieving app list for project #{project_id}"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps")
 				apps = json["apps"] || []
-				UI.success "Found #{apps.count} apps"
+				UI.verbose "Found #{apps.count} apps"
 				apps
 			end
 
@@ -98,9 +98,9 @@ module Fastlane
 			end
 
 			def download_config_file(project_id, app_id)
-				UI.message "Downloading config file"
+				UI.verbose "Downloading config file"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps/#{app_id}/config")
-				UI.success "Successfuly downloaded #{json["configFilename"]}"
+				UI.verbose "Successfuly downloaded #{json["configFilename"]}"
 				json
 			end
 		end

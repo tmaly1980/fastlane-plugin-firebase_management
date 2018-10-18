@@ -5,18 +5,18 @@ module Fastlane
 			def self.run(params)
 				manager = Firebase::Manager.new
 
-				# Login
+				# login
 				api = manager.login(params[:service_account_json_path])
 
-				#Select project
+				# select project
 				project = manager.select_project(params[:project_id])
 				project_id = project["projectId"]
 
-				#Select app
+				# select app
 				app = manager.select_app(project, params[:app_id])
 				app_id = app["appId"]
 
-				#Download
+				# download
 				config = api.download_config_file(project_id, app_id)
 				path = File.join(params[:output_path], params[:output_name] || config["configFilename"])
 
@@ -26,10 +26,12 @@ module Fastlane
 				end 
 
 				UI.success "Successfuly saved config at #{path}"
+
+				return nil
 			end
 
 			def self.description
-				"An unofficial tool to access Firebase"
+				"Download configuration file for Firebase app"
 			end
 
 			def self.authors
@@ -42,7 +44,7 @@ module Fastlane
 
 			def self.details
 				# Optional:
-				"Firebase helps you list your projects, create applications, download configuration files and more..."
+				"Firebase plugin helps you list your projects, create applications and download configuration files."
 			end
 
 			def self.available_options
@@ -63,7 +65,7 @@ module Fastlane
 					                        env_name: "FIREBASE_OUTPUT_PATH",
 					                     description: "Path for the downloaded config",
 					                        optional: false,
-					                        default_value: "./"),
+					                   default_value: "./"),
 					FastlaneCore::ConfigItem.new(key: :output_name,
 					                        env_name: "FIREBASE_OUTPUT_NAME",
 					                     description: "Name of the downloaded file",
