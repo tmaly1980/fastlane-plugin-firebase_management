@@ -6,10 +6,6 @@ lane :test_add_client do
   firebase_add_client
 end
 
-lane :test_delete_client do
-  firebase_delete_client
-end
-
 lane :test_upload_certificate do
   firebase_upload_certificate(type: "development")
 end

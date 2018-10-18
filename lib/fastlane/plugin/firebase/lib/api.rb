@@ -1,24 +1,21 @@
 module Fastlane
-  module Firebase
-  	class Api 
+	module Firebase
+		class Api 
 			class LoginError < StandardError 
 			end
 
 			class BadRequestError < StandardError
 				attr_reader :code
- 				def initialize(msg, code)
-			    @code = code
-			    super(msg)
-			  end
+				
+				def initialize(msg, code)
+					@code = code
+					super(msg)
+				end
 			end
-
-			require 'mechanize'
-			require 'digest/sha1'
-			require 'json'
-			require 'cgi'
 
 			require 'googleauth'
 			require 'httparty'
+
 			def initialize(jsonPath)
 				@base_url = "https://firebase.googleapis.com"
 
@@ -27,8 +24,8 @@ module Fastlane
 				authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
 					json_key_io: File.open(jsonPath),
 					scope: scope
-					)
-  
+				)
+
 				access_token = authorizer.fetch_access_token!["access_token"]
 				@authorization_headers = {
 					'Authorization' => 'Bearer ' + access_token
@@ -36,29 +33,29 @@ module Fastlane
 			end
 
 			def request_json(path, method = :get, parameters = Hash.new, headers = Hash.new)
-					begin
-						if method == :get then
-							response = HTTParty.get("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), format: :plain)
-						elsif method == :post then
-							headers['Content-Type'] = 'application/json'
-							response = HTTParty.post("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), body: parameters.to_json, format: :plain)
-						elsif method == :delete then
-							# TODO
-							page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
-						end
-
-						case response.code
-							when 400...600
-								UI.crash! response
-							else
-								JSON.parse(response)
-						end
-
-					rescue HTTParty::Error => e
-						UI.crash! e.response.body
-					rescue StandardError => e
-						UI.crash! e
+				begin
+					if method == :get then
+						response = HTTParty.get("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), format: :plain)
+					elsif method == :post then
+						headers['Content-Type'] = 'application/json'
+						response = HTTParty.post("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), body: parameters.to_json, format: :plain)
+					elsif method == :delete then
+						# TODO
+						page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
 					end
+
+					case response.code
+						when 400...600
+							UI.crash! response
+						else
+							JSON.parse(response)
+					end
+
+				rescue HTTParty::Error => e
+					UI.crash! e.response.body
+				rescue StandardError => e
+					UI.crash! e
+				end
 			end
 
 			def project_list
@@ -79,7 +76,6 @@ module Fastlane
 
 			def add_ios_app(project_id, bundle_id, app_name)
 				parameters = {
-					"projectId" => project_id,
 					"bundleId" => bundle_id,
 					"displayName" => app_name || ""
 				}
@@ -104,7 +100,6 @@ module Fastlane
 			def download_config_file(project_id, app_id)
 				UI.message "Downloading config file"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps/#{app_id}/config")
-				# returns 501 NOT IMPLEMENTED
 				UI.success "Successfuly downloaded #{json["configFilename"]}"
 				json
 			end

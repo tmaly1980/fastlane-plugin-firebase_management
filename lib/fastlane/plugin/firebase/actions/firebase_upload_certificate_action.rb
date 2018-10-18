@@ -55,7 +55,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Tomas Kohout"]
+        ["Ackee, s.r.o."]
       end
 
       def self.return_value
