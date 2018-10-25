@@ -30,17 +30,17 @@ module Fastlane
 				end
 			end
 
-			def select_app(project, app_id)
+			def select_app(project_id, app_id)
 
-				project["apps"] = @api.app_list(project["projectId"])
+				apps = @api.app_list(project_id)
 
 
-				if project["apps"].empty? then
+				if apps.empty? then
 					UI.user_error! "Project has no apps"
 					return
 				end
 
-				apps = project["apps"].sort {|left, right| left["appId"] <=> right["appId"] }
+				apps = apps.sort {|left, right| left["appId"] <=> right["appId"] }
 
 				if app = apps.select {|a| a["appId"] == app_id }.first then
 					app

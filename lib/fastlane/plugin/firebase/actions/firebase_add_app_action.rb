@@ -1,6 +1,6 @@
 module Fastlane
 	module Actions
-		class FirebaseAddClientAction < Action
+		class FirebaseAddAppAction < Action
 			
 			def self.run(params)
 				manager = Firebase::Manager.new
@@ -15,6 +15,7 @@ module Fastlane
 				type = params[:type].to_sym
 
 				bundle_id = params[:bundle_id]
+				
 				display_name = params[:display_name]
 
 				case type

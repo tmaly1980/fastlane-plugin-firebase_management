@@ -39,9 +39,6 @@ module Fastlane
 					elsif method == :post then
 						headers['Content-Type'] = 'application/json'
 						response = HTTParty.post("#{@base_url}/#{path}", headers: headers.merge(@authorization_headers), body: parameters.to_json, format: :plain)
-					elsif method == :delete then
-						# TODO
-						page = @agent.delete("#{@sdk_url}#{path}?key=#{@api_key}", parameters, headers.merge(@authorization_headers))
 					end
 
 					case response.code

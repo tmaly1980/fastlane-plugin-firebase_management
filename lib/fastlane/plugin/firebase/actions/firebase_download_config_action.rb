@@ -13,7 +13,7 @@ module Fastlane
 				project_id = project["projectId"]
 
 				# select app
-				app = manager.select_app(project, params[:app_id])
+				app = manager.select_app(project_id, params[:app_id])
 				app_id = app["appId"]
 
 				# download

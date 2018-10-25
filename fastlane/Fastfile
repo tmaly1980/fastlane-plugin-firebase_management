@@ -2,8 +2,8 @@ lane :test_list do
   firebase_list
 end
 
-lane :test_add_client do
-  firebase_add_client
+lane :test_add_app do
+  firebase_add_app
 end
 
 lane :test_download_config do

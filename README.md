@@ -40,10 +40,10 @@ firebase_list
 ```
 
 
-Add client to a project and download config file
+Add app to a project and download config file
 
 ```
-firebase_add_client
+firebase_add_app
 ```
 
 
