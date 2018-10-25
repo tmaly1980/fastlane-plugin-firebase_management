@@ -9,15 +9,22 @@ module Fastlane
 				api = manager.login(params[:service_account_json_path])
 
 				# select project
-				project = manager.select_project(params[:project_id])
-				project_id = project["projectId"]
+				project_id = params[:project_id] || manager.select_project(nil)["projectId"]
+
+				# select type
+				type = params[:type].to_sym
 
 				# select app
-				app = manager.select_app(project_id, params[:app_id])
-				app_id = app["appId"]
+				app_id = params[:app_id] || manager.select_app(project_id, nil, type)["appId"]
 
 				# download
-				config = api.download_config_file(project_id, app_id)
+				case type
+				when :ios
+					config = api.download_ios_config_file(project_id, app_id)
+				when :android
+					config = api.download_android_config_file(project_id, app_id)
+				end
+				
 				path = File.join(params[:output_path], params[:output_name] || config["configFilename"])
 
 				decode_base64_content = Base64.decode64(config["configFileContents"]) 
@@ -61,6 +68,14 @@ module Fastlane
 					                        env_name: "FIREBASE_APP_ID",
 					                     description: "Project app id",
 					                        optional: true),
+					FastlaneCore::ConfigItem.new(key: :type,
+											env_name: "FIREBASE_TYPE",
+										 description: "Type of client (ios, android)",
+											verify_block: proc do |value|
+												types = [:ios, :android]
+												UI.user_error!("Type must be in #{types}") unless types.include?(value.to_sym)
+											end
+										 ),
 					FastlaneCore::ConfigItem.new(key: :output_path,
 					                        env_name: "FIREBASE_OUTPUT_PATH",
 					                     description: "Path for the downloaded config",

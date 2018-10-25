@@ -84,7 +84,7 @@ module Fastlane
 					"bundleId" => bundle_id,
 					"displayName" => app_name || ""
 				}
-
+				
 				request_json("v1beta1/projects/#{project_id}/iosApps", :post, parameters)
 			end
 
@@ -111,9 +111,16 @@ module Fastlane
 				json = request_json("v1/projects/#{project_number}/clients/#{client_id}:setApnsCertificate", :post, parameters)
 			end
 
-			def download_config_file(project_id, app_id)
+			def download_ios_config_file(project_id, app_id)
 				UI.verbose "Downloading config file"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps/#{app_id}/config")
+				UI.verbose "Successfuly downloaded #{json["configFilename"]}"
+				json
+			end
+
+			def download_android_config_file(project_id, app_id)
+				UI.verbose "Downloading config file"
+				json = request_json("v1beta1/projects/#{project_id}/androidApps/#{app_id}/config")
 				UI.verbose "Successfuly downloaded #{json["configFilename"]}"
 				json
 			end

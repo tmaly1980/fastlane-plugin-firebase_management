@@ -9,7 +9,7 @@ module Fastlane
 				api = manager.login(params[:service_account_json_path])
 
 				# select project
-				project = manager.select_project(params[:project_id])
+				project_id = params[:project_id] || manager.select_project(nil)["projectId"]
 
 				# select type
 				type = params[:type].to_sym
@@ -21,7 +21,7 @@ module Fastlane
 				case type
 				when :ios
 					# create new ios app on Firebase
-					api.add_ios_app(project["projectId"], bundle_id, display_name)
+					api.add_ios_app(project_id, bundle_id, display_name)
 
 					# App creation is a long-running operation.
 					# Creation endpoint returns operation ID which should be used to check
@@ -31,20 +31,20 @@ module Fastlane
 					sleep 3
 
 					# download apps for project
-					apps = api.ios_app_list(project["projectId"])
+					apps = api.ios_app_list(project_id)
 
 					# search for newly created app
 					app = apps.detect {|app| app["bundleId"] == bundle_id }
 
 				when :android
 					# create new android app on Firebase
-					api.add_android_app(project["projectId"], bundle_id, display_name)
+					api.add_android_app(project_id, bundle_id, display_name)
 
 					# see reason described above
 					sleep 3
 
 					# download apps for project
-					apps = api.android_app_list(project["projectId"])
+					apps = api.android_app_list(project_id)
 
 					# search for newly created app
 					app = apps.detect {|app| app["packageName"] == bundle_id }
@@ -61,8 +61,9 @@ module Fastlane
 					#Download config
 					Actions::FirebaseDownloadConfigAction.run(
 						service_account_json_path: params[:service_account_json_path],
-						project_id: params[:project_id],
+						project_id: project_id,
 						app_id: app["appId"],
+						type: type,
 						output_path: params[:output_path]
 					)
 				end

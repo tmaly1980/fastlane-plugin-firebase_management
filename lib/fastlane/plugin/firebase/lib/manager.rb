@@ -30,13 +30,17 @@ module Fastlane
 				end
 			end
 
-			def select_app(project_id, app_id)
+			def select_app(project_id, app_id, type)
 
-				apps = @api.app_list(project_id)
-
+				case type
+				when :ios
+					apps = @api.ios_app_list(project_id)
+				when :android
+					apps = @api.android_app_list(project_id)
+				end
 
 				if apps.empty? then
-					UI.user_error! "Project has no apps"
+					UI.user_error! "Project has no #{type} apps"
 					return
 				end
 
@@ -45,7 +49,7 @@ module Fastlane
 				if app = apps.select {|a| a["appId"] == app_id }.first then
 					app
 				else
-					options = apps.map { |a| "#{a["displayName"] || a["bundleId"]} (#{a["appId"]})" }
+					options = apps.map { |a| "#{a["displayName"] || a["bundleId"] || a["packageName"]} (#{a["appId"]})" }
 					index = select_index("Select app:", options)
 					apps[index]
 				end
