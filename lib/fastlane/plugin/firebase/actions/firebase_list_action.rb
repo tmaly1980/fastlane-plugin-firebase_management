@@ -13,17 +13,30 @@ module Fastlane
 
 				# download list of apps for each project
 				projects.map! { |project|
-					project["apps"] = api.app_list(project["projectId"])
+					project["iosApps"] = api.ios_app_list(project["projectId"])
+					project["androidApps"] = api.android_app_list(project["projectId"])
 					project
 				}
 
 				# create formatted output
 				projects.each_with_index { |p, i| 
 					UI.message "#{i+1}. #{p["displayName"]} (#{p["projectId"]})" 
-					apps = p["apps"] || []
-					apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
-						UI.message "  - #{app["displayName"] || app["bundleId"]} (#{app["appId"]})" 
-					}
+					
+					ios_apps = p["iosApps"] || []
+					if !ios_apps.empty? then
+						UI.message "  iOS"
+						ios_apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
+							UI.message "  - #{app["displayName"] || app["bundleId"]} (#{app["appId"]})" 
+						}
+					end
+
+					android_apps = p["androidApps"] || []
+					if !android_apps.empty? then
+						UI.message "  Android"
+						android_apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
+							UI.message "  - #{app["displayName"] || app["packageName"]} (#{app["appId"]})" 
+						}
+					end
 				}
 
 				return nil

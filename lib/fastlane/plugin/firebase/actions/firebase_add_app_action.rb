@@ -15,7 +15,7 @@ module Fastlane
 				type = params[:type].to_sym
 
 				bundle_id = params[:bundle_id]
-				
+
 				display_name = params[:display_name]
 
 				case type
@@ -31,20 +31,30 @@ module Fastlane
 					sleep 3
 
 					# download apps for project
-					apps = api.app_list(project["projectId"])
+					apps = api.ios_app_list(project["projectId"])
 
 					# search for newly created app
 					app = apps.detect {|app| app["bundleId"] == bundle_id }
 
-					# present result to user
-					if app != nil then
-						UI.success "New app with id: #{app["appId"]} successfully created"
-					else
-						UI.crash! "Unable to create new app"
-					end
-
 				when :android
-					UI.crash! "Not implemented"
+					# create new android app on Firebase
+					api.add_android_app(project["projectId"], bundle_id, display_name)
+
+					# see reason described above
+					sleep 3
+
+					# download apps for project
+					apps = api.android_app_list(project["projectId"])
+
+					# search for newly created app
+					app = apps.detect {|app| app["packageName"] == bundle_id }
+				end
+
+				# present result to user
+				if app != nil then
+					UI.success "New app with id: #{app["appId"]} successfully created"
+				else
+					UI.crash! "Unable to create new app"
 				end
 
 				if params[:download_config] then

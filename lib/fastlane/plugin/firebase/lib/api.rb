@@ -63,9 +63,17 @@ module Fastlane
 				projects
 			end
 
-			def app_list(project_id)
+			def ios_app_list(project_id)
 				UI.verbose "Retrieving app list for project #{project_id}"
 				json = request_json("v1beta1/projects/#{project_id}/iosApps")
+				apps = json["apps"] || []
+				UI.verbose "Found #{apps.count} apps"
+				apps
+			end
+
+			def android_app_list(project_id)
+				UI.verbose "Retrieving app list for project #{project_id}"
+				json = request_json("v1beta1/projects/#{project_id}/androidApps")
 				apps = json["apps"] || []
 				UI.verbose "Found #{apps.count} apps"
 				apps
@@ -78,6 +86,15 @@ module Fastlane
 				}
 
 				request_json("v1beta1/projects/#{project_id}/iosApps", :post, parameters)
+			end
+
+			def add_android_app(project_id, package_name, app_name)
+				parameters = {
+					"packageName" => package_name,
+					"displayName" => app_name || ""
+				}
+
+				request_json("v1beta1/projects/#{project_id}/androidApps", :post, parameters)
 			end
 
 			def upload_certificate(project_number, client_id, type, certificate_value, certificate_password)
