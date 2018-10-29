@@ -1,4 +1,4 @@
-# firebase plugin
+# firebase_management `fastlane` Plugin
 
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase)
 
@@ -7,33 +7,18 @@
 This project is a [fastlane](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-firebase`, add it to your project by running:
 
 ```bash
-fastlane add_plugin firebase
+fastlane add_plugin firebase_management
 ```
 
-## About firebase
+## About firebase_management
 
-An unofficial tool to access Firebase project settings. It allows you to create new clients (apps) and delete existing ones. It also allows to download config files (GoogleInfo.plist for ios and google-services.json for android) and upload push notification certificates (ios).
+An unofficial tool to access Firebase project settings. It allows you to create new apps and download config files (GoogleInfo.plist for ios and google-services.json for android).
 
-Plugin also supports two-step verification! 
-
-:white_check_mark: Voice or text message
-
-:white_check_mark: Authenticator app
-
-:x: Google prompt
-
-:x: Security key
-
-## Disclaimer
-**!! Important !!**
-
-This tool uses internal firebase api and logs-in through google login using web scrapper tool. Until firebase provides official api, this is all we got. The use of web-based google login might result in email warnings from google about new login from unknown device. We recommend creating an extra account for the use of the firebase plugin and set it with limited permissions. We give no warranties whatsoever.
-
+Plugin uses new official Firebase Management API introduced on Firebase Summit 10/2018. It's based on [tkohout/fastlane-firebase-plugin](https://github.com/tkohout/fastlane-firebase-plugin), which uses web scraping instead of official API to manage Firebase apps.
 
 ### Actions
 
-
-List all projects and clients 
+List all projects and apps
 
 ```
 firebase_list
@@ -44,19 +29,6 @@ Add app to a project and download config file
 
 ```
 firebase_add_app
-```
-
-
-Remove existing client from a project 
-
-```
-firebase_delete_client
-```
-
-Upload push certificate to a client
-
-```
-firebase_upload_certificate
 ```
 
 Download config file for a client
