@@ -5,13 +5,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/plugin/firebase/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'fastlane-plugin-firebase'
+  spec.name          = 'fastlane-plugin-firebase_management'
   spec.version       = Fastlane::Firebase::VERSION
-  spec.author        = 'Tomas Kohout'
-  spec.email         = 'email@tomaskohout.cz'
+  spec.author        = 'Ackee'
+  spec.email         = 'jan.misar@ackee.cz'
 
   spec.summary       = 'Unofficial tool to access Firebase project settings'
-  spec.homepage      = "https://github.com/tkohout/fastlane-firebase-plugin"
+  spec.homepage      = "https://github.com/AckeeCZ/fastlane-plugin-firebase_management"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w[README.md LICENSE]
@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'fastlane', '>= 2.5.0'
-  spec.add_dependency 'mechanize'
   spec.add_dependency 'googleauth'
   spec.add_dependency 'httparty'
   
