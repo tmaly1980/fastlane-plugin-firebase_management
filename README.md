@@ -16,6 +16,8 @@ An unofficial tool to access Firebase project settings. It allows you to create 
 
 Plugin uses new official Firebase Management API introduced on Firebase Summit 10/2018. It's based on [tkohout/fastlane-firebase-plugin](https://github.com/tkohout/fastlane-firebase-plugin), which uses web scraping instead of official API to manage Firebase apps.
 
+**This very first version was developed using alpha version of the API in a very short time, so it's not well tested and may contain bugs or mistakes. Issues and PRs are very welcome! 🤗**
+
 ### Actions
 
 List all projects and apps
