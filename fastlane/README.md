@@ -20,19 +20,9 @@ or alternatively using `brew cask install fastlane`
 fastlane test_list
 ```
 
-### test_add_client
+### test_add_app
 ```
-fastlane test_add_client
-```
-
-### test_delete_client
-```
-fastlane test_delete_client
-```
-
-### test_upload_certificate
-```
-fastlane test_upload_certificate
+fastlane test_add_app
 ```
 
 ### test_download_config

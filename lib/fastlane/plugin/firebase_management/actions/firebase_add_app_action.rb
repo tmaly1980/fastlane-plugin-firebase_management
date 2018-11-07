@@ -1,9 +1,9 @@
 module Fastlane
 	module Actions
-		class FirebaseAddAppAction < Action
+		class FirebaseManagementAddAppAction < Action
 			
 			def self.run(params)
-				manager = Firebase::Manager.new
+				manager = FirebaseManagement::Manager.new
 				
 				# login
 				api = manager.login(params[:service_account_json_path])
@@ -59,7 +59,7 @@ module Fastlane
 
 				if params[:download_config] then
 					#Download config
-					Actions::FirebaseDownloadConfigAction.run(
+					Actions::FirebaseManagementDownloadConfigAction.run(
 						service_account_json_path: params[:service_account_json_path],
 						project_id: project_id,
 						app_id: app["appId"],

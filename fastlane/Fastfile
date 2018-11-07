@@ -1,11 +1,11 @@
 lane :test_list do
-  firebase_list
+  firebase_management_list
 end
 
 lane :test_add_app do
-  firebase_add_app
+  firebase_management_add_app
 end
 
 lane :test_download_config do
-  firebase_download_config
+  firebase_management_download_config
 end

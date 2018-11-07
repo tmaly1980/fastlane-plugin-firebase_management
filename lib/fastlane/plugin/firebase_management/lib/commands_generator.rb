@@ -2,7 +2,7 @@ require 'commander'
 require 'fastlane/version'
 
 
-module Firebase
+module FirebaseManagement
   class CommandsGenerator
     include Commander::Methods
 

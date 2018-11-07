@@ -1,11 +1,11 @@
 module Fastlane
-	module Firebase
+	module FirebaseManagement
 		class Manager
 
 			def login(jsonPath)
 				begin 
 					#Api instance
-					@api = Firebase::Api.new(jsonPath)
+					@api = FirebaseManagement::Api.new(jsonPath)
 					@api
 				rescue StandardError => e
 					UI.crash! e

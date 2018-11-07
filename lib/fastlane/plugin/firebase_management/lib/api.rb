@@ -1,5 +1,5 @@
 module Fastlane
-	module Firebase
+	module FirebaseManagement
 		class Api 
 			class LoginError < StandardError 
 			end
