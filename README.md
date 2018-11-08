@@ -14,9 +14,11 @@ fastlane add_plugin firebase_management
 
 An unofficial tool to access Firebase project settings. It allows you to create new apps and download config files (GoogleInfo.plist for ios and google-services.json for android).
 
-Plugin uses new official Firebase Management API introduced on Firebase Summit 10/2018. It's based on [tkohout/fastlane-firebase-plugin](https://github.com/tkohout/fastlane-firebase-plugin), which uses web scraping instead of official API to manage Firebase apps.
+Plugin uses new official [Firebase Management API](https://firebase.google.com/docs/projects/api/reference/rest/) introduced on Firebase Summit 10/2018. It's based on [tkohout/fastlane-firebase-plugin](https://github.com/tkohout/fastlane-firebase-plugin), which uses web scraping instead of official API to manage Firebase apps. The plan is that both plugins will live next to each other until official API will contain all desired features and tkohout's plugin won't be needed anymore.
 
-**This very first version was developed using alpha version of the API in a very short time, so it's not well tested and may contain bugs or mistakes. Issues and PRs are very welcome! 🤗**
+New features like deleting apps or APNs keys/certificates management are promised by guys from Google/Firebase so stay tuned 🤙
+
+**This very first version was developed using alpha version of the API in a very short time, so it may contain bugs or mistakes. Issues and PRs are very welcome! 🤗**
 
 ### Actions
 
@@ -38,6 +40,14 @@ Download config file for a client
 ```
 firebase_download_config
 ```
+
+### Authentication
+
+Plugin works only with service accounts. A service account is a special Google account that belongs to your application or a virtual machine, instead of to an individual end user. Read more [here](https://cloud.google.com/iam/docs/service-accounts).
+
+All you need for the plugin to work is a json file with service account private key information. The easiest way to get it is...
+
+Go to Firebase Console -> Your project -> Project settings -> Service accounts and tap on button `Generate new private key`. 🎉 That's the file you need!
 
 ## Example
 
