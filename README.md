@@ -25,20 +25,20 @@ New features like deleting apps or APNs keys/certificates management are promise
 List all projects and apps
 
 ```
-firebase_list
+firebase_management_list
 ```
 
 
 Add app to a project and download config file
 
 ```
-firebase_add_app
+firebase_management_add_app
 ```
 
 Download config file for a client
 
 ```
-firebase_download_config
+firebase_management_download_config
 ```
 
 ### Authentication
