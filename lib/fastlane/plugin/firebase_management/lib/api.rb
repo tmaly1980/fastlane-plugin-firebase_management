@@ -62,22 +62,37 @@ module Fastlane
 				UI.verbose "Found #{projects.count} projects"
 				projects
 			end
+					
+                        def ios_app_list(project_id, params = nil)
+                                UI.verbose "Retrieving app list for project #{project_id}"
 
-			def ios_app_list(project_id)
-				UI.verbose "Retrieving app list for project #{project_id}"
-				json = request_json("v1beta1/projects/#{project_id}/iosApps")
-				apps = json["apps"] || []
-				UI.verbose "Found #{apps.count} apps"
-				apps
-			end
+                                apps = []
+                                pageToken = nil
+                                loop do
+                                        url = "v1beta1/projects/#{project_id}/iosApps" + (pageToken ? "?pageToken=#{pageToken}" : "")
+                                        json = request_json(url)
+                                        apps.concat(json["apps"] || [])
+                                        pageToken = json["nextPageToken"]
+                                        break if !pageToken
+                                end
+                                UI.verbose "Found #{apps.count} apps"
+                                apps
+                        end
 
-			def android_app_list(project_id)
-				UI.verbose "Retrieving app list for project #{project_id}"
-				json = request_json("v1beta1/projects/#{project_id}/androidApps")
-				apps = json["apps"] || []
-				UI.verbose "Found #{apps.count} apps"
-				apps
-			end
+                        def android_app_list(project_id)
+                                UI.verbose "Retrieving app list for project #{project_id}"
+                                apps = []
+                                pageToken = nil
+                                loop do
+                                        url = "v1beta1/projects/#{project_id}/androidApps" + (pageToken ? "?pageToken=#{pageToken}" : "")
+                                        json = request_json(url)
+                                        apps.concat(json["apps"] || [])
+                                        pageToken = json["nextPageToken"]
+                                        break if !pageToken
+                                end
+                                UI.verbose "Found #{apps.count} apps"
+                                apps
+                        end
 
 			def add_ios_app(project_id, bundle_id, app_name)
 				parameters = {
