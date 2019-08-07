@@ -6,7 +6,15 @@ module Fastlane
 				manager = FirebaseManagement::Manager.new
 
 				# login
-				api = manager.login(params[:service_account_json_path])
+				api = nil
+				if params[:service_account_json_path] != nil then
+					api = manager.serviceAccountLogin(params[:service_account_json_path])
+				elsif params[:email] != nil && params[:client_secret_json_path] != nil then
+					api = manager.userLogin(params[:email], params[:client_secret_json_path])
+				else
+					UI.error "You must define service_account_json_path or email with client_secret_json_path."
+					return nil
+				end
 
 				# select project
 				project_id = params[:project_id] || manager.select_project(nil)["projectId"]
@@ -56,18 +64,31 @@ module Fastlane
 
 			def self.available_options
 				[
+					FastlaneCore::ConfigItem.new(key: :email,
+											env_name: "FIREBASE_EMAIL",
+										 description: "User's email to identify stored credentials",
+											optional: true),
+
+					FastlaneCore::ConfigItem.new(key: :client_secret_json_path,
+											env_name: "FIREBASE_CLIENT_SECRET_JSON_PATH",
+										 description: "Path to client secret json file",
+											optional: true),
+
 					FastlaneCore::ConfigItem.new(key: :service_account_json_path,
 					                        env_name: "FIREBASE_SERVICE_ACCOUNT_JSON_PATH",
 					                     description: "Path to service account json key",
-					                        optional: false),
+					                        optional: true),
+
 					FastlaneCore::ConfigItem.new(key: :project_id,
 					                        env_name: "FIREBASE_PROJECT_ID",
 					                     description: "Project id",
 					                        optional: true),
+
 					FastlaneCore::ConfigItem.new(key: :app_id,
 					                        env_name: "FIREBASE_APP_ID",
 					                     description: "Project app id",
 					                        optional: true),
+
 					FastlaneCore::ConfigItem.new(key: :type,
 											env_name: "FIREBASE_TYPE",
 										 description: "Type of client (ios, android)",
@@ -81,6 +102,7 @@ module Fastlane
 					                     description: "Path for the downloaded config",
 					                        optional: false,
 					                   default_value: "./"),
+					
 					FastlaneCore::ConfigItem.new(key: :output_name,
 					                        env_name: "FIREBASE_OUTPUT_NAME",
 					                     description: "Name of the downloaded file",
