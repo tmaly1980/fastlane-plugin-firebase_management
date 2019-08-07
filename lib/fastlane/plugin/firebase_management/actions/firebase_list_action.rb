@@ -11,18 +11,11 @@ module Fastlane
 				# download list of projects
 				projects = api.project_list()
 
-				# download list of apps for each project
-				projects.map! { |project|
-					project["iosApps"] = api.ios_app_list(project["projectId"])
-					project["androidApps"] = api.android_app_list(project["projectId"])
-					project
-				}
-
 				# create formatted output
 				projects.each_with_index { |p, i| 
 					UI.message "#{i+1}. #{p["displayName"]} (#{p["projectId"]})" 
 					
-					ios_apps = p["iosApps"] || []
+					ios_apps = api.ios_app_list(p["projectId"])
 					if !ios_apps.empty? then
 						UI.message "  iOS"
 						ios_apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
@@ -30,7 +23,7 @@ module Fastlane
 						}
 					end
 
-					android_apps = p["androidApps"] || []
+					android_apps = api.android_app_list(p["projectId"])
 					if !android_apps.empty? then
 						UI.message "  Android"
 						android_apps.sort {|left, right| left["appId"] <=> right["appId"] }.each_with_index { |app, j|
