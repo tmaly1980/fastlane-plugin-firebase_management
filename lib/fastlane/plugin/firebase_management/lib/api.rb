@@ -16,17 +16,8 @@ module Fastlane
 			require 'googleauth'
 			require 'httparty'
 
-			def initialize(jsonPath)
+			def initialize(access_token)
 				@base_url = "https://firebase.googleapis.com"
-
-				scope = 'https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/cloud-platform'
-
-				authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-					json_key_io: File.open(jsonPath),
-					scope: scope
-				)
-
-				access_token = authorizer.fetch_access_token!["access_token"]
 				@authorization_headers = {
 					'Authorization' => 'Bearer ' + access_token
 				}

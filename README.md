@@ -43,7 +43,13 @@ firebase_management_download_config
 
 ### Authentication
 
-Plugin works only with service accounts. A service account is a special Google account that belongs to your application or a virtual machine, instead of to an individual end user. Read more [here](https://cloud.google.com/iam/docs/service-accounts).
+~~Plugin works only with service accounts.~~
+
+#### User login
+You can use your ordinary account in combination with client secret json file created in GCP console.
+
+#### Service accounts
+A service account is a special Google account that belongs to your application or a virtual machine, instead of to an individual end user. Read more [here](https://cloud.google.com/iam/docs/service-accounts).
 
 All you need for the plugin to work is a json file with service account private key information. The easiest way to get it is...
 

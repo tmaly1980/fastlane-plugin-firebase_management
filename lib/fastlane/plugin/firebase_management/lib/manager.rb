@@ -2,14 +2,49 @@ module Fastlane
 	module FirebaseManagement
 		class Manager
 
-			def login(jsonPath)
-				begin 
-					#Api instance
-					@api = FirebaseManagement::Api.new(jsonPath)
-					@api
-				rescue StandardError => e
-					UI.crash! e
+			require 'googleauth'
+			require 'googleauth/stores/file_token_store'
+
+			def userLogin(email, client_secrets_path)
+
+				system 'mkdir -p ~/.google'
+
+				oob_uri = "urn:ietf:wg:oauth:2.0:oob"
+
+				scopes = [
+					'https://www.googleapis.com/auth/firebase',
+					'https://www.googleapis.com/auth/cloud-platform'
+				]
+				client_id = Google::Auth::ClientId.from_file(client_secrets_path)
+				token_store = Google::Auth::Stores::FileTokenStore.new(:file => File.expand_path("~/.google/tokens.yaml"))
+				authorizer = Google::Auth::UserAuthorizer.new(client_id, scopes, token_store)
+
+				credentials = authorizer.get_credentials(email)
+				if credentials.nil?
+				  url = authorizer.get_authorization_url(base_url: oob_uri)
+				  UI.message "Open #{url} in your browser and enter the resulting code."
+
+				  code = Fastlane::Actions::PromptAction.run(text: "Code: ")
+
+				  credentials = authorizer.get_and_store_credentials_from_code(user_id: email, code: code, base_url: oob_uri)
 				end
+				
+				token = credentials.fetch_access_token!["access_token"]
+				@api = FirebaseManagement::Api.new(token)
+				@api
+			end
+
+			def serviceAccountLogin(jsonPath)
+				scope = 'https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/cloud-platform'
+
+				authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+					json_key_io: File.open(jsonPath),
+					scope: scope
+				)
+
+				token = authorizer.fetch_access_token!["access_token"]
+				@api = FirebaseManagement::Api.new(token)
+				@api
 			end
 
 			def select_project(project_id)
